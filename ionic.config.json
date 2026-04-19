@@ -1,0 +1,7 @@
+{
+  "name": "Pemutar musik",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

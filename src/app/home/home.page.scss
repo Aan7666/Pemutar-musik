@@ -1,0 +1,112 @@
+/* Layout Utama - Diubah jadi flex-start agar tidak terpotong saat di-scroll */
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  min-height: 100%; 
+  max-width: 400px;
+  margin: 0 auto;
+  padding-top: 30px; 
+  padding-bottom: 50px; 
+}
+ion-content {
+  /* Contoh gradasi biru keunguan */
+  --background: linear-gradient(135deg, #5c532b 0%, #4c4d48 100%);
+}
+
+/* Desain Kotak Sampul Album */
+.album-art {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, #333333, #555555);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  margin-bottom: 30px;
+}
+
+.album-art ion-icon {
+  font-size: 80px;
+  color: #a0a0a0;
+}
+
+/* Teks Judul Lagu */
+.track-info {
+  text-align: center;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.track-info h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #ffffff; /* Asumsi background gelap */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 20px;
+}
+
+/* Kustomisasi Progress Bar */
+ion-range {
+  --bar-background: rgba(255, 255, 255, 0.2);
+  --bar-background-active: var(--ion-color-primary);
+  --knob-background: var(--ion-color-primary);
+}
+
+/* Animasi Tombol Play */
+.btn-play {
+  --box-shadow: 0 8px 15px rgba(var(--ion-color-primary-rgb), 0.4);
+}
+
+/* --- OVERLAY ANIMASI 3 DETIK --- */
+.swipe-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.85); 
+  color: #ffffff;
+  padding: 25px 35px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; 
+  text-align: center;
+  pointer-events: none; 
+  animation: fadeInOut 3s forwards; 
+}
+
+.swipe-overlay ion-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  animation: bounceOverlay 1s infinite; 
+}
+
+.swipe-overlay p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+/* Kunci Animasi Overlay Fade In/Out */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -40%); }
+  15% { opacity: 1; transform: translate(-50%, -50%); } 
+  85% { opacity: 1; transform: translate(-50%, -50%); } 
+  100% { opacity: 0; transform: translate(-50%, -60%); display: none; } 
+}
+
+/* Kunci Animasi Overlay Mantul */
+@keyframes bounceOverlay {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}

@@ -1,0 +1,95 @@
+<ion-content class="ion-padding">
+
+  <div class="swipe-overlay" *ngIf="showOverlay">
+    <ion-icon name="chevron-up-outline"></ion-icon>
+    <p>GESER KE ATAS<br>UNTUK TRACKLIST</p>
+  </div>
+
+  <div class="player-container">
+    
+    <div class="album-art">
+      <ion-icon name="musical-notes"></ion-icon>
+    </div>
+
+    <div class="visualizer-container" style="width: 100%; display: flex; justify-content: center; margin-top: 15px; margin-bottom: 15px;">
+      <canvas #visualizerCanvas width="300" height="100" style="background: transparent; width: 100%; max-width: 300px; border-radius: 8px;"></canvas>
+    </div>
+    
+    <div class="track-info">
+      <h2>{{ playlist[currentTrackIndex]?.title || 'Pilih Lagu' }}</h2>
+    </div>
+
+    <div class="progress-container" style="width: 100%; margin-bottom: 20px;">
+      <div class="time-indicator" style="display: flex; justify-content: space-between; padding: 0 5px; color: #888;">
+        <span>{{ formatTime(progress) }}</span>
+        <span>{{ formatTime(duration) }}</span>
+      </div>
+      <ion-range min="0" [max]="duration" [(ngModel)]="progress" (ionChange)="seek($event)" color="primary" style="padding-top: 0; padding-bottom: 0;"></ion-range>
+    </div>
+
+    <div class="volume-container" style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 30px;">
+      <ion-button fill="clear" color="medium" (click)="volumeDown()"><ion-icon name="volume-low-outline"></ion-icon></ion-button>
+      <span style="margin: 0 20px; font-weight: bold; color: #888; font-size: 16px;">{{ volume }}%</span>
+      <ion-button fill="clear" color="medium" (click)="volumeUp()"><ion-icon name="volume-high-outline"></ion-icon></ion-button>
+    </div>
+
+    <div class="controls" style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin-bottom: 30px;">
+      <ion-button fill="clear" [color]="isLooping ? 'primary' : 'light'" (click)="toggleLoop()"><ion-icon name="repeat-outline"></ion-icon></ion-button>
+      <ion-button fill="clear" color="light" (click)="prev()"><ion-icon name="play-skip-back"></ion-icon></ion-button>
+      <ion-button fill="solid" color="primary" shape="round" class="btn-play" style="width: 64px; height: 64px;" (click)="togglePlay()">
+        <ion-icon [name]="isPlaying ? 'pause' : 'play'" style="font-size: 32px;"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" color="light" (click)="next()"><ion-icon name="play-skip-forward"></ion-icon></ion-button>
+      <ion-button fill="clear" color="light" disabled><ion-icon name="shuffle-outline"></ion-icon></ion-button>
+    </div>
+
+    <div class="file-upload" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; width: 100%; padding: 0 10px;">
+      <input type="file" accept="audio/mp3, audio/*" id="file-input" style="display: none;" (change)="tambahLaguDariStorage($event)">
+      <ion-button expand="block" fill="outline" shape="round" color="medium" onclick="document.getElementById('file-input').click()">
+        <ion-icon name="document-attach-outline" slot="start"></ion-icon> Pilih 1 Lagu Manual
+      </ion-button>
+      <ion-button expand="block" fill="solid" shape="round" color="secondary" (click)="scanForMp3Files()">
+        <ion-icon name="search-outline" slot="start"></ion-icon> Scan Semua Lagu
+      </ion-button>
+    </div>
+
+    <ion-list style="width: 100%; margin-top: 10px; border-radius: 10px; background: transparent;">
+      <ion-list-header>
+        <ion-label style="font-weight: bold; color: #888;">Daftar Putaran ({{ playlist.length }} Lagu)</ion-label>
+      </ion-list-header>
+
+      <ion-item 
+        *ngFor="let track of playlist; let i = index" 
+        [color]="i === currentTrackIndex ? 'light' : ''"
+        lines="full"
+        style="--background: transparent; margin-bottom: 2px;">
+        
+        <ion-icon 
+          [name]="(isPlaying && i === currentTrackIndex) ? 'pause-circle' : 'play-circle-outline'" 
+          slot="start" 
+          [color]="i === currentTrackIndex ? 'primary' : 'medium'"
+          (click)="playTrack(i)"
+          style="font-size: 24px;">
+        </ion-icon>
+        
+        <ion-label (click)="playTrack(i)">
+          <h3 [style.color]="i === currentTrackIndex ? 'var(--ion-color-primary)' : '#fff'" 
+              [style.font-weight]="i === currentTrackIndex ? 'bold' : 'normal'"
+              style="margin: 0; font-size: 14px;">
+            {{ track.title }}
+          </h3>
+        </ion-label>
+
+        <div slot="end" style="display: flex; align-items: center;">
+          <ion-icon *ngIf="isPlaying && i === currentTrackIndex" name="stats-chart" color="primary" style="margin-right: 10px;"></ion-icon>
+          
+          <ion-button fill="clear" color="danger" (click)="hapusLagu(i, $event)" style="--padding-start: 8px; --padding-end: 8px;">
+            <ion-icon name="trash-outline" slot="icon-only" style="font-size: 18px;"></ion-icon>
+          </ion-button>
+        </div>
+
+      </ion-item>
+    </ion-list>
+
+  </div>
+</ion-content>
