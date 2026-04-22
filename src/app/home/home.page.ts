@@ -1,7 +1,9 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
-// 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS
+import { Device } from '@capacitor/device'; // 👇 WAJIB DITAMBAHKAN
+import { Platform } from '@ionic/angular';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { MusicControls } from '@awesome-cordova-plugins/music-controls/ngx';
 
 @Component({
@@ -12,40 +14,9 @@ import { MusicControls } from '@awesome-cordova-plugins/music-controls/ngx';
 })
 export class HomePage implements OnInit {
 
-  hapusLagu(index: number, event: any) {
-  // Mencegah lagu otomatis terputar saat menekan tombol hapus
-  event.stopPropagation();
-
-  // Jika lagu yang dihapus sedang diputar, hentikan player
-  if (index === this.currentTrackIndex) {
-    this.player.pause();
-    this.isPlaying = false;
-    if (this.musicControls) {
-      this.musicControls.updateIsPlaying(false);
-    }
-  }
-
-  // Hapus dari daftar
-  this.playlist.splice(index, 1);
-
-  // Penyesuaian Index
-  if (this.playlist.length === 0) {
-    this.playlist = [{ title: 'Daftar Kosong', url: '' }];
-    this.currentTrackIndex = 0;
-  } else if (index < this.currentTrackIndex) {
-    this.currentTrackIndex--;
-  } else if (index === this.currentTrackIndex) {
-    if (this.currentTrackIndex >= this.playlist.length) {
-      this.currentTrackIndex = 0;
-    }
-    this.setupPlayer();
-  }
-}
-
   // ==========================================
   // 1. DEKLARASI VARIABEL
   // ==========================================
-
   @ViewChild('visualizerCanvas', { static: false }) visualizerCanvas!: ElementRef<HTMLCanvasElement>;
   private audioCtx?: AudioContext;
   private analyser?: AnalyserNode;
@@ -61,41 +32,78 @@ export class HomePage implements OnInit {
   duration: number = 0;
   isLooping: boolean = false;
   volume: number = 50;
-
   showOverlay: boolean = true; 
 
   // ==========================================
-  // 2. SIKLUS HIDUP (LIFECYCLE)
+  // 2. SIKLUS HIDUP (LIFECYCLE) & CONSTRUCTOR
   // ==========================================
-
-  // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS (Inject MusicControls ke constructor)
-  constructor(private musicControls: MusicControls) {
+  
+  // 👇 INJEKSI PLUGIN DI CONSTRUCTOR DIPERBAIKI
+  constructor(
+    private musicControls: MusicControls,
+    private androidPermissions: AndroidPermissions,
+    private platform: Platform
+  ) {
     this.setupPlayer();
-
     setTimeout(() => {
       this.showOverlay = false;
     }, 3000);
   }
 
   ngOnInit() {
-    this.scanForMp3Files();
+    // Tunggu platform siap, lalu minta izin sebelum scan
+    this.platform.ready().then(() => {
+      this.cekDanMintaIzin();
+    });
   }
 
   // ==========================================
-  // 3. FITUR SCAN FILE LOKAL
+  // 3. LOGIKA REQUEST PERMISSION (BARU)
   // ==========================================
+async cekDanMintaIzin() {
+  if (this.platform.is('android')) {
+    try {
+      const info = await Device.getInfo();
+      let targetPerm: string;
 
-async scanForMp3Files() {
- try {
-    const permissions = await Filesystem.requestPermissions();
-    
-    // Cek status izin lebih luas (untuk mendukung berbagai versi Android)
-    if (permissions.publicStorage === 'granted' || (permissions as any).state === 'granted') {
-      this.playlist = []; // Reset playlist
+      // 👇 TAMBAHKAN PENGECEKAN info.androidSDKVersion DI SINI
+      if (info.androidSDKVersion && info.androidSDKVersion >= 33) {
+        targetPerm = (this.androidPermissions as any).PERMISSION.READ_MEDIA_AUDIO;
+      } else {
+        targetPerm = this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE;
+      }
+
+      const check = await this.androidPermissions.checkPermission(targetPerm);
       
-      // Daftar kemungkinan folder yang berisi MP3
-      // Kita masukkan 'Downloads' (jamak) untuk jaga-jaga
-     const foldersToScan = ['Download', 'Downloads', 'Music', 'music'];
+      if (!check.hasPermission) {
+        // Minta izin ke user
+        const req = await this.androidPermissions.requestPermission(targetPerm);
+        
+        if (req.hasPermission) {
+          this.scanForMp3Files(); // Izin diberikan
+        } else {
+          // JIKA DITOLAK
+          alert('Izin ditolak oleh Android! Tidak bisa otomatis scan.');
+        }
+      } else {
+        // Izin sudah pernah diberikan sebelumnya
+        this.scanForMp3Files(); 
+      }
+    } catch (err) {
+      // MUNCULKAN ERROR JIKA PLUGIN GAGAL JALAN
+      alert('Error Plugin Permission: ' + JSON.stringify(err));
+    }
+  } else {
+    this.scanForMp3Files();
+  }
+}
+  // ==========================================
+  // 4. FITUR SCAN FILE LOKAL (DIPERBAIKI)
+  // ==========================================
+  async scanForMp3Files() {
+    try {
+      this.playlist = []; // Reset playlist
+      const foldersToScan = ['Download', 'Downloads', 'Music', 'music'];
       let totalSongsFound = 0;
 
       for (const folder of foldersToScan) {
@@ -105,7 +113,6 @@ async scanForMp3Files() {
             directory: Directory.ExternalStorage
           });
 
-          // Filter file .mp3
           const mp3Files = result.files.filter(file => 
             file.name && file.name.toLowerCase().endsWith('.mp3')
           );
@@ -118,10 +125,7 @@ async scanForMp3Files() {
             });
             totalSongsFound++;
           });
-
-          console.log(`Scan ${folder} sukses: ditemukan ${mp3Files.length} lagu.`);
         } catch (err) {
-          // Abaikan jika folder tidak ada
           console.warn(`Folder ${folder} tidak ditemukan atau kosong.`);
         }
       }
@@ -129,45 +133,66 @@ async scanForMp3Files() {
       if (this.playlist.length > 0) {
         this.currentTrackIndex = 0;
         this.setupPlayer();
-        alert(`Berhasil menemukan ${totalSongsFound} lagu!`);
+        console.log(`Berhasil menemukan ${totalSongsFound} lagu!`);
       } else {
         alert('Tidak ditemukan lagu .mp3 di folder Music atau Download.');
+        // Kembalikan playlist kosong agar UI tidak error
+        this.playlist = [{ title: 'Daftar Kosong', url: '' }];
       }
 
-    } else {
-      alert('Izin penyimpanan diperlukan untuk memindai lagu.');
+    } catch (error) {
+      console.error('Kesalahan scanning:', error);
     }
-  } catch (error) {
-    console.error('Kesalahan scanning:', error);
   }
-}
+
+  // ==========================================
+  // 5. MANAJEMEN PLAYLIST (FUNGSI ASLI KAMU)
+  // ==========================================
+  hapusLagu(index: number, event: any) {
+    event.stopPropagation();
+    if (index === this.currentTrackIndex) {
+      this.player.pause();
+      this.isPlaying = false;
+      if (this.musicControls) {
+        this.musicControls.updateIsPlaying(false);
+      }
+    }
+
+    this.playlist.splice(index, 1);
+
+    if (this.playlist.length === 0) {
+      this.playlist = [{ title: 'Daftar Kosong', url: '' }];
+      this.currentTrackIndex = 0;
+    } else if (index < this.currentTrackIndex) {
+      this.currentTrackIndex--;
+    } else if (index === this.currentTrackIndex) {
+      if (this.currentTrackIndex >= this.playlist.length) {
+        this.currentTrackIndex = 0;
+      }
+      this.setupPlayer();
+    }
+  }
+
   tambahLaguDariStorage(event: any) {
     const file = event.target.files[0]; 
-    
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      
       this.playlist.push({
         title: file.name, 
         url: fileURL
       });
-
       this.currentTrackIndex = this.playlist.length - 1;
       this.setupPlayer();
       this.checkAndResumeAudioContext(); 
       this.player.play();
       this.isPlaying = true;
-      
-      // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS
       this.updateMediaControls(); 
     }
   }
 
   // ==========================================
-  // 4. FITUR VISUALIZER AUDIO
+  // 6. FITUR VISUALIZER AUDIO
   // ==========================================
-  
-  // ... (Fungsi initVisualizer, drawVisualizer, checkAndResumeAudioContext tetap sama) ...
   initVisualizer() {
     if (this.isVisualizerInit || !this.visualizerCanvas) return;
     const canvas = this.visualizerCanvas.nativeElement;
@@ -209,16 +234,15 @@ async scanForMp3Files() {
   }
 
   // ==========================================
-  // 5. KONTROL PLAYER MUSIK & NOTIFIKASI
+  // 7. KONTROL PLAYER MUSIK & NOTIFIKASI
   // ==========================================
-
-  // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS (Fungsi Baru)
   updateMediaControls() {
     const currentTrack = this.playlist[this.currentTrackIndex];
-    
+    if (!currentTrack || currentTrack.url === '') return; // Cegah error jika playlist kosong
+
     this.musicControls.create({
       track: currentTrack.title,
-      artist: 'Aplikasi Musikku', // Bisa diganti
+      artist: 'Aplikasi Musikku',
       isPlaying: this.isPlaying,
       dismissable: true,
       hasPrev: true,
@@ -230,12 +254,8 @@ async scanForMp3Files() {
     this.musicControls.subscribe().subscribe((action) => {
       const message = JSON.parse(action).message;
       switch(message) {
-        case 'music-controls-next':
-          this.next();
-          break;
-        case 'music-controls-previous':
-          this.prev();
-          break;
+        case 'music-controls-next': this.next(); break;
+        case 'music-controls-previous': this.prev(); break;
         case 'music-controls-pause':
           this.player.pause();
           this.isPlaying = false;
@@ -253,32 +273,21 @@ async scanForMp3Files() {
           break;
       }
     });
-
     this.musicControls.listen();
   }
 
   setupPlayer() {
+    if (!this.playlist[this.currentTrackIndex]?.url) return;
+    
     this.player.src = this.playlist[this.currentTrackIndex].url;
     this.player.load();
-    
     this.player.loop = this.isLooping; 
     this.player.volume = this.volume / 100;
 
-    this.player.onloadedmetadata = () => {
-      this.duration = this.player.duration;
-    };
+    this.player.onloadedmetadata = () => { this.duration = this.player.duration; };
+    this.player.ontimeupdate = () => { this.progress = this.player.currentTime; };
+    this.player.onended = () => { if (!this.isLooping) { this.next(); } };
 
-    this.player.ontimeupdate = () => {
-      this.progress = this.player.currentTime;
-    };
-
-    this.player.onended = () => {
-      if (!this.isLooping) {
-        this.next();
-      }
-    };
-
-    // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS (Update info lagu saat ganti track)
     this.updateMediaControls();
   }
 
@@ -290,8 +299,6 @@ async scanForMp3Files() {
       this.player.play();
     }
     this.isPlaying = !this.isPlaying;
-    
-    // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS (Update icon Play/Pause di notifikasi)
     this.musicControls.updateIsPlaying(this.isPlaying);
   }
 
@@ -301,8 +308,6 @@ async scanForMp3Files() {
     this.checkAndResumeAudioContext(); 
     this.player.play();
     this.isPlaying = true;
-    
-    // 👇 DITAMBAHKAN UNTUK MEDIA CONTROLS
     this.musicControls.updateIsPlaying(true);
   }
 
@@ -323,9 +328,7 @@ async scanForMp3Files() {
       this.player.play();
     }
   }
-  
 
-  // ... (Fungsi seek, toggleLoop, volumeUp, volumeDown, formatTime tetap sama persis) ...
   seek(event: any) {
     const newValue = event.detail.value;
     this.player.currentTime = newValue;
@@ -352,10 +355,6 @@ async scanForMp3Files() {
     }
   }
 
-  // ==========================================
-  // 6. UTILITY (FUNGSI BANTUAN)
-  // ==========================================
-
   formatTime(value: number) {
     if (!value || isNaN(value)) {
       return '00:00';
@@ -367,4 +366,3 @@ async scanForMp3Files() {
     return `${minsStr}:${secsStr}`;
   }
 }
-

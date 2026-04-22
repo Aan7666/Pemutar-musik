@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.aishhamusik.pemutarmusik;
 
 import com.getcapacitor.BridgeActivity;
 

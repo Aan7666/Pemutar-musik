@@ -40,17 +40,19 @@
         <ion-icon [name]="isPlaying ? 'pause' : 'play'" style="font-size: 32px;"></ion-icon>
       </ion-button>
       <ion-button fill="clear" color="light" (click)="next()"><ion-icon name="play-skip-forward"></ion-icon></ion-button>
-      <ion-button fill="clear" color="light" disabled><ion-icon name="shuffle-outline"></ion-icon></ion-button>
     </div>
 
     <div class="file-upload" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; width: 100%; padding: 0 10px;">
       <input type="file" accept="audio/mp3, audio/*" id="file-input" style="display: none;" (change)="tambahLaguDariStorage($event)">
-      <ion-button expand="block" fill="outline" shape="round" color="medium" onclick="document.getElementById('file-input').click()">
-        <ion-icon name="document-attach-outline" slot="start"></ion-icon> Pilih 1 Lagu Manual
-      </ion-button>
       <ion-button expand="block" fill="solid" shape="round" color="secondary" (click)="scanForMp3Files()">
         <ion-icon name="search-outline" slot="start"></ion-icon> Scan Semua Lagu
       </ion-button>
+ <div style="display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 5px; padding: 10px; background-color: rgba(255, 196, 9, 0.1); border-radius: 8px; border: 1px solid var(--ion-color-warning);">
+    <ion-icon name="warning-outline" color="warning" style="margin-right: 8px; font-size: 24px; min-width: 24px;"></ion-icon>
+    <span style="color: var(--ion-color-warning); font-size: 12px; font-weight: 500; text-align: left; line-height: 1.4;">
+      Harap izinkan akses file musik dan audio di pengaturan perangkat agar lagu bisa dibaca.
+    </span>
+  </div>
     </div>
 
     <ion-list style="width: 100%; margin-top: 10px; border-radius: 10px; background: transparent;">
