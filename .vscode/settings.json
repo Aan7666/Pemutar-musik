@@ -1,3 +1,13 @@
 {
-  "typescript.preferences.autoImportFileExcludePatterns": ["@ionic/angular/common", "@ionic/angular/standalone"]
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular/standalone"
+  ],
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "chat.tools.terminal.autoApprove": {
+    "/^cd \"c:\\\\Users\\\\ASUS TUF GAMING\\\\Downloads\" ; cmd /c \"dir INFINIX-Infinix-X6725-Android-15_2026-04-26_133328\\.logcat\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
 }

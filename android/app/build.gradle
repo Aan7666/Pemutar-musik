@@ -7,34 +7,20 @@ android {
         applicationId "com.aishhamusik.pemutarmusik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.2.0"
+        versionCode 6
+        versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-
-    // 👇 TAMBAHKAN DI SINI
-    packagingOptions {
-        pickFirst 'META-INF/androidx.cursoradapter_cursoradapter.version'
-        pickFirst 'META-INF/androidx.versionedparcelable_versionedparcelable.version'
-        pickFirst 'META-INF/androidx.core_core.version'
-        pickFirst 'META-INF/androidx.drawerlayout_drawerlayout.version'
-        pickFirst 'META-INF/androidx.customview_customview.version'
-        pickFirst 'META-INF/androidx.interpolator_interpolator.version'
-        pickFirst 'META-INF/androidx.loader_loader.version'
-        pickFirst 'META-INF/androidx.viewpager_viewpager.version'
-        pickFirst 'META-INF/androidx.print_print.version'
-        pickFirst 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
-        pickFirst 'META-INF/androidx.swiperefreshlayout_swiperefreshlayout.version'
     }
 }
 
