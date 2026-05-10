@@ -4,24 +4,14 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
-import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
-
-import { MusicControls } from '@awesome-cordova-plugins/music-controls/ngx';
-
 
 @NgModule({
   imports: [
-   
     CommonModule,
     FormsModule,
     IonicModule,
     HomePageRoutingModule
   ],
-  declarations: [HomePage],
-
-  providers: [
-    MusicControls,
-     AndroidPermissions
-  ]
+  declarations: [HomePage]
 })
 export class HomePageModule {}

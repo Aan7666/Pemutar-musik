@@ -1,0 +1,16 @@
+<ion-content class="ion-padding ion-text-center">
+  <div *ngIf="!isChecking" style="margin-top: 50%;">
+    <h2>Selamat Datang</h2>
+    <p>Izinkan akses musik dan notifikasi untuk mulai memutar lagu favoritmu.</p>
+    
+   <!-- Contoh tombol di permission.page.html -->
+<ion-button (click)="requestMediaPermission()" [disabled]="mediaGranted">
+  Izinkan Akses Musik
+</ion-button>
+
+<ion-button (click)="requestNotificationPermission()" [disabled]="notificationGranted">
+  Izinkan Notifikasi
+</ion-button>
+    
+  </div>
+</ion-content>  

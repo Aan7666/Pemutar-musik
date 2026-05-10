@@ -1,112 +1,264 @@
-/* Layout Utama - Diubah jadi flex-start agar tidak terpotong saat di-scroll */
+/* Background utama tetap buram */
+.home-content {
+  --background: rgba(88, 102, 115, 0.993);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  padding-bottom: 40px;
+}
+
+/* Pembungkus player tanpa bingkai/card */
 .player-container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; 
-  min-height: 100%; 
-  max-width: 400px;
-  margin: 0 auto;
-  padding-top: 30px; 
-  padding-bottom: 50px; 
-}
-ion-content {
-  /* Contoh gradasi biru keunguan */
-  --background: linear-gradient(135deg, #5c532b 0%, #4c4d48 100%);
 }
 
-/* Desain Kotak Sampul Album */
+/* Album Art diperbesar dan diberi bayangan lembut */
 .album-art {
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(135deg, #333333, #555555);
-  border-radius: 20px;
+  width: 240px;
+  height: 240px;
+  background: linear-gradient(135deg, #f5f7fa, #000000);
+  border-radius: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  margin-bottom: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  margin: 10px auto 32px;
 }
 
 .album-art ion-icon {
-  font-size: 80px;
-  color: #a0a0a0;
+  font-size: 100px;
+  color: #a6abb0;
 }
 
-/* Teks Judul Lagu */
+/* Teks disesuaikan agar terbaca di latar terang (warna gelap) */
 .track-info {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 28px;
   width: 100%;
 }
 
 .track-info h2 {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.7rem;
+  font-weight: 800;
   margin: 0;
-  color: #ffffff; /* Asumsi background gelap */
-  white-space: nowrap;
+  color: #1c1c22;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 20px;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
 }
 
-/* Kustomisasi Progress Bar */
+.track-status {
+  margin: 8px auto 0;
+  color: #6e6e7d;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Visualizer menyatu dengan background */
+.visualizer-container {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 24px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: inset 0 2px 10px rgba(228, 228, 228, 0.03);
+}
+
+.visualizer-container canvas {
+  width: 100%;
+  height: 90px;
+  border-radius: 12px;
+}
+
+/* Progress Container */
+.progress-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.time-indicator {
+  display: flex;
+  justify-content: space-between;
+  color: #6e6e7d;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: -6px;
+}
+
 ion-range {
-  --bar-background: rgba(255, 255, 255, 0.2);
+  --bar-background: rgba(0, 0, 0, 0.08);
   --bar-background-active: var(--ion-color-primary);
   --knob-background: var(--ion-color-primary);
+  --knob-border: 2px solid #ffffff;
+  --knob-box-shadow: 0 4px 10px rgb(202, 202, 202);
 }
 
-/* Animasi Tombol Play */
+/* Kontrol Volume */
+.volume-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.volume-label {
+  min-width: 50px;
+  text-align: center;
+  color: #1c1c22;
+  font-weight: 700;
+}
+
+/* Area Tombol Playback */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.controls ion-button {
+  --padding-start: 10px;
+  --padding-end: 10px;
+}
+
 .btn-play {
-  --box-shadow: 0 8px 15px rgba(var(--ion-color-primary-rgb), 0.4);
+  width: 64px;
+  height: 64px;
+  --border-radius: 50%;
+  margin: 0 10px;
 }
 
-/* --- OVERLAY ANIMASI 3 DETIK --- */
+.play-icon {
+  font-size: 34px;
+}
+
+/* File Upload & Warning */
+.file-upload {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.permission-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(255, 171, 0, 0.15);
+  border-radius: 14px;
+  color: #b37700;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Playlist Card disesuaikan menjadi versi transparan terang */
+.playlist-card {
+  max-width: 420px;
+  margin: 20px auto 0;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+ion-card-header {
+  padding: 22px 22px 10px;
+}
+
+ion-card-title {
+  color: #1c1c22;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+ion-card-subtitle {
+  color: #6e6e7d;
+  font-weight: 600;
+}
+
+.transparent-list {
+  background: transparent;
+}
+
+.track-item {
+  --background: transparent;
+  margin-bottom: 4px;
+  border-radius: 16px;
+}
+
+.track-item ion-label h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #fcfcff;
+}
+
+/* Efek Swipe Overlay */
 .swipe-overlay {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.85); 
+  background-color: rgba(255, 238, 238, 0.7);
   color: #ffffff;
-  padding: 25px 35px;
+  padding: 24px 32px;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 9999; 
+  z-index: 9999;
   text-align: center;
-  pointer-events: none; 
-  animation: fadeInOut 3s forwards; 
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  animation: fadeInOut 3s forwards;
 }
 
 .swipe-overlay ion-icon {
-  font-size: 40px;
+  font-size: 42px;
   margin-bottom: 10px;
-  animation: bounceOverlay 1s infinite; 
+  animation: bounceOverlay 1s infinite;
 }
 
 .swipe-overlay p {
   margin: 0;
   font-size: 13px;
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 1px;
   line-height: 1.5;
 }
 
-/* Kunci Animasi Overlay Fade In/Out */
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translate(-50%, -40%); }
-  15% { opacity: 1; transform: translate(-50%, -50%); } 
-  85% { opacity: 1; transform: translate(-50%, -50%); } 
-  100% { opacity: 0; transform: translate(-50%, -60%); display: none; } 
+  15% { opacity: 1; transform: translate(-50%, -50%); }
+  85% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -60%); }
 }
 
-/* Kunci Animasi Overlay Mantul */
 @keyframes bounceOverlay {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-7px); }
+}
+
+@media (max-width: 480px) {
+  .player-container {
+    padding: 10px 14px 20px;
+  }
+  .album-art {
+    width: 200px;
+    height: 200px;
+  }
 }
