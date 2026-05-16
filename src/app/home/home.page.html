@@ -26,15 +26,29 @@
       <ion-range min="0" [max]="duration" [(ngModel)]="progress" (ionChange)="seek($event)" color="primary"></ion-range>
     </div>
     
-    <div class="volume-controls">
+    <!-- Bagian Volume Controls yang Diperbarui -->
+    <div class="volume-controls" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+      
+      <!-- Tombol Kurangi Volume (Minus di kiri Speaker) -->
       <ion-button fill="clear" color="medium" (click)="volumeDown()">
-        <ion-icon name="volume-low-outline"></ion-icon>
+        <div style="display: flex; align-items: center; gap: 2px;">
+          <span style="font-size: 1.2rem; font-weight: bold; position: relative; top: -1px;">-</span>
+          <ion-icon name="volume-low-outline"></ion-icon>
+        </div>
       </ion-button>
-      <div class="volume-label">{{ volume }}%</div>
+      
+      <div class="volume-label" style="font-weight: bold; width: 45px; text-align: center;">{{ volume }}%</div>
+      
+      <!-- Tombol Tambah Volume (Speaker di kiri Plus) -->
       <ion-button fill="clear" color="medium" (click)="volumeUp()">
-        <ion-icon name="volume-high-outline"></ion-icon>
+        <div style="display: flex; align-items: center; gap: 2px;">
+          <ion-icon name="volume-high-outline"></ion-icon>
+          <span style="font-size: 1.2rem; font-weight: bold; position: relative; top: -1px;">+</span>
+        </div>
       </ion-button>
+      
     </div>
+    <!-- Akhir Bagian Volume Controls -->
     
     <div class="controls">
       <ion-button fill="clear" [color]="isLooping ? 'primary' : 'dark'" (click)="toggleLoop()">

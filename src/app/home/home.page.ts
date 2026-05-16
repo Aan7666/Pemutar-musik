@@ -297,9 +297,12 @@ export class HomePage implements OnInit, OnDestroy {
       this.updatePlaybackState();
     };
 
-    this.player.onended = () => {
+   this.player.onended = () => {
       this.ngZone.run(() => {
-        if (!this.isLooping) this.next();
+        if (!this.isLooping) {
+          this.isPlaying = true; // Paksa status UI menjadi playing
+          this.next(); 
+        }
       });
     };
   }
@@ -328,44 +331,38 @@ toggleShuffle() {
     await this.safePlay();
   }
 
- async next() {
+async next() {
     if (this.isShuffle && this.playlist.length > 1) {
-      // Logika Shuffle: Pilih indeks acak yang berbeda dari lagu saat ini
       let randomIndex = this.currentTrackIndex;
       while (randomIndex === this.currentTrackIndex) {
         randomIndex = Math.floor(Math.random() * this.playlist.length);
       }
       this.currentTrackIndex = randomIndex;
     } else {
-      // Logika Linear (Normal)
       this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
     }
 
     this.setupPlayer();
 
-    if (this.isPlaying) {
-      await this.safePlay();
-    }
+    // Langsung panggil safePlay() tanpa syarat pengecekan isPlaying
+    await this.safePlay();
   }
 
   async prev() {
     if (this.isShuffle && this.playlist.length > 1) {
-      // Logika Shuffle: Pilih indeks acak
       let randomIndex = this.currentTrackIndex;
       while (randomIndex === this.currentTrackIndex) {
         randomIndex = Math.floor(Math.random() * this.playlist.length);
       }
       this.currentTrackIndex = randomIndex;
     } else {
-      // Logika Linear (Normal)
       this.currentTrackIndex = (this.currentTrackIndex - 1 + this.playlist.length) % this.playlist.length;
     }
 
     this.setupPlayer();
 
-    if (this.isPlaying) {
-      await this.safePlay();
-    }
+    // Langsung panggil safePlay() tanpa syarat
+    await this.safePlay();
   }
 
   seek(e: any) {
